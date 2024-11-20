@@ -9,7 +9,7 @@ use Spatie\GoogleCalendar\Event;
 |--------------------------------------------------------------------------
 */
 
-Route::post('/webhook/asaas', [\App\Http\Controllers\WebhookController::class, 'handleAsaas']);
+Route::post('/callback/asaas', [\App\Http\Controllers\FrontEnd\PaymentGateway\AsaasController::class, 'handleAsaas'])->name('asaas.callback');
 
 Route::get('/offline', 'FrontEnd\HomeController@offline');
 
@@ -109,7 +109,7 @@ Route::middleware('change.lang')->group(function () {
 
 Route::prefix('event-booking')->group(function () {
   Route::get('/paypal/notify', 'FrontEnd\PaymentGateway\PayPalController@notify')->name('event_booking.paypal.notify');
-  Route::get('/paypal/cancel', 'FrontEnd\PaymentGateway\PayPalController@cancel')->name('event_booking.cancel');
+  Route::get('/paypal/cancel', 'FrontEnd\PaymentGateway\PayPalController@cancel');
 
   Route::post('/apply-coupon', 'FrontEnd\EventController@applyCoupon')->name('apply-coupon');
 

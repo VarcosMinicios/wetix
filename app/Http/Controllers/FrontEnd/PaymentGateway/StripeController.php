@@ -20,7 +20,7 @@ class StripeController extends Controller
   public function bookingProcess(Request $request, $eventId)
   {
     $eventId = $eventId;
-    // card validation start 
+    // card validation start
     $rules = [
       'fname' => 'required',
       'lname' => 'required',
