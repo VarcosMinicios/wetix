@@ -98,6 +98,35 @@ class AsaasController extends Controller
         $customer_id = $response['id'];
       }
 
+      $arrData = array(
+        'event_id' => $eventId,
+        'price' => $total,
+        'tax' => $tax_amount,
+        'commission' => $commission_amount,
+        'quantity' => $quantity,
+        'discount' => $discount,
+        'total_early_bird_dicount' => $total_early_bird_dicount,
+        'currencyText' => $currencyInfo->base_currency_text,
+        'currencyTextPosition' => $currencyInfo->base_currency_text_position,
+        'currencySymbol' => $currencyInfo->base_currency_symbol,
+        'currencySymbolPosition' => $currencyInfo->base_currency_symbol_position,
+        'fname' => $request->fname,
+        'lname' => $request->lname,
+        'email' => $request->email,
+        'phone' => $request->phone,
+        'country' => $request->country,
+        'state' => $request->state,
+        'city' => $request->city,
+        'zip_code' => $request->city,
+        'address' => $request->address,
+        'paymentMethod' => 'Asaas',
+        'gatewayType' => 'online',
+        'paymentStatus' => 'incomplete',
+      );
+
+      $bookingController = new BookingController();
+      $bookingInfo = $bookingController->storeData($arrData);
+
       try {
         try {
           $charge = Http::withHeaders([
@@ -109,7 +138,7 @@ class AsaasController extends Controller
             'value' => $stripeTotal,
             'description' => 'Payment for event booking',
             'callback' => [
-              'successUrl' => route('asaas.callback'),
+              'successUrl' => route('event_booking.complete', ['id' => $eventId, 'booking_id' => $bookingInfo->id]),
             ]
           ])->json();
 
@@ -118,34 +147,7 @@ class AsaasController extends Controller
           return redirect()->route('check-out');
         }
 
-        dump($charge);
-
-        $arrData = array(
-          'event_id' => $eventId,
-          'charge_id' => $charge['id'],
-          'price' => $total,
-          'tax' => $tax_amount,
-          'commission' => $commission_amount,
-          'quantity' => $quantity,
-          'discount' => $discount,
-          'total_early_bird_dicount' => $total_early_bird_dicount,
-          'currencyText' => $currencyInfo->base_currency_text,
-          'currencyTextPosition' => $currencyInfo->base_currency_text_position,
-          'currencySymbol' => $currencyInfo->base_currency_symbol,
-          'currencySymbolPosition' => $currencyInfo->base_currency_symbol_position,
-          'fname' => $request->fname,
-          'lname' => $request->lname,
-          'email' => $request->email,
-          'phone' => $request->phone,
-          'country' => $request->country,
-          'state' => $request->state,
-          'city' => $request->city,
-          'zip_code' => $request->city,
-          'address' => $request->address,
-          'paymentMethod' => 'Asaas',
-          'gatewayType' => 'online',
-          'paymentStatus' => 'incomplete',
-        );
+        $arrData['charge_id'] = $charge['id'];
 
         $checkoutData = new CheckoutData($arrData);
         $checkoutData->save();
@@ -175,7 +177,7 @@ class AsaasController extends Controller
         $checkoutData->status = 'completed';
 
         $bookingController = new BookingController();
-        $bookingInfo = $bookingController->storeData($checkoutData->toArray());
+        $bookingInfo = $bookingController->getBookingInfo($checkoutData->id);
 
         $invoice = $bookingController->generateInvoice($bookingInfo, $checkoutData->event_id);
         //unlink qr code
@@ -210,7 +212,6 @@ class AsaasController extends Controller
 
         // send a mail to the customer with the invoice
         $bookingController->sendMail($bookingInfo);
-
 
         return redirect()->route('event_booking.complete', [
           'id' => $checkoutData->event_id, 'booking_id' => $bookingInfo->id

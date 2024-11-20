@@ -11,6 +11,7 @@ class CheckoutData extends Model
 
   protected $fillable = [
     'event_id',
+    'booking_id',
     'charge_id',
     'price',
     'tax',
