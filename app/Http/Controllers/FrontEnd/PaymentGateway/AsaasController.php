@@ -180,7 +180,7 @@ class AsaasController extends Controller
           $checkoutData->status = 'completed';
 
           $bookingController = new BookingController();
-          $bookingInfo = Booking::find($checkoutData->booking_id);
+          $bookingInfo = Booking::where('booking_id', $checkoutData->booking_id)->first();
 
           $invoice = $bookingController->generateInvoice($bookingInfo, $checkoutData->event_id);
           //unlink qr code
