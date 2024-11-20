@@ -22,6 +22,6 @@ class VerifyCsrfToken extends Middleware
     '*/phonepe/notify',
     '/xendit/callback',
     '*/webhook',
-    'webhook/asaas',
+    'callback/asaas',
   ];
 }
