@@ -175,7 +175,7 @@ class AsaasController extends Controller
 
       if ($event === 'PAYMENT_CONFIRMED') {
         if ($payload['payment']['status'] === 'CONFIRMED') {
-          $checkoutData = CheckoutData::where('payment_id', $payload['payment']['id'])->first();
+          $checkoutData = CheckoutData::where('charge_id', $payload['payment']['id'])->first();
           $checkoutData->status = 'completed';
 
           $bookingController = new BookingController();
