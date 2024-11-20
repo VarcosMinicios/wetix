@@ -7,6 +7,7 @@ use App\Http\Controllers\FrontEnd\Event\BookingController;
 use App\Models\BasicSettings\Basic;
 use App\Models\CheckoutData;
 use App\Models\Earning;
+use App\Models\Event\Booking;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -179,7 +180,7 @@ class AsaasController extends Controller
           $checkoutData->status = 'completed';
 
           $bookingController = new BookingController();
-          $bookingInfo = $bookingController->getBookingInfo($checkoutData->id);
+          $bookingInfo = Booking::find($checkoutData->booking_id);
 
           $invoice = $bookingController->generateInvoice($bookingInfo, $checkoutData->event_id);
           //unlink qr code
